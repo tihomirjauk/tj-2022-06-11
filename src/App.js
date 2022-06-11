@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Button } from "@mui/material";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 
 import "./App.css";
 
@@ -29,12 +32,14 @@ const checkboxList = [
 ];
 
 function CheckboxTreeComponent({ data, onChange, allowMultiCheck = false }) {
-    const uncheckBranch = (item) => {
-        item.value = false;
-        item.children.map((child) => {
-            child.value = false;
-            return child;
-        });
+    const setBranch = (checked) => (item) => {
+        if (item.value) {
+            item.value = checked;
+            item.children.map((child) => {
+                child.value = checked;
+                return child;
+            });
+        }
         return item;
     };
 
@@ -48,18 +53,18 @@ function CheckboxTreeComponent({ data, onChange, allowMultiCheck = false }) {
 
         // only one parent checkbox can be checked at a time
         if (nextValue && !allowMultiCheck) {
-            nextData = nextData.map(uncheckBranch);
+            nextData = nextData.map(setBranch(false));
         }
         nextData[index].value = nextValue;
 
         // When you check on the parent checkbox,
         // the children checkboxes should also be checked
         if (nextValue) {
-            nextData[index].children.map((child) => {
-                child.value = nextValue;
-                return child;
-            });
         }
+        nextData[index].children.map((child) => {
+            child.value = nextValue;
+            return child;
+        });
 
         onChange(nextData);
     };
@@ -82,7 +87,7 @@ function CheckboxTreeComponent({ data, onChange, allowMultiCheck = false }) {
                     parentIndex !== index &&
                     parent.children.every((el) => el.value)
                 ) {
-                    return uncheckBranch(parent);
+                    return setBranch(false)(parent);
                 }
                 return parent;
             });
@@ -97,16 +102,22 @@ function CheckboxTreeComponent({ data, onChange, allowMultiCheck = false }) {
                 key={`chk-${index}`}
                 style={{
                     textAlign: "left",
-                    paddingLeft: "50px",
+                    padding: "5px 30px",
                 }}
             >
-                <input
-                    type="checkbox"
-                    checked={item.value ? "checked" : ""}
-                    onChange={toggleCheckbox(index)}
-                />
-                <label onClick={toggleCheckbox(index)}>
-                    {item.value ? "True" : "False"}
+                <label
+                    onClick={toggleCheckbox(index)}
+                    style={{
+                        display: "flex",
+                        cursor: "pointer",
+                    }}
+                >
+                    {item.value ? (
+                        <CheckBoxIcon sx={{ color: "blue" }} />
+                    ) : (
+                        <CheckBoxOutlineBlankIcon />
+                    )}
+                    {item.id} - {item.value ? "True" : "False"}
                 </label>
                 <CheckboxTreeComponent
                     data={item.children}
@@ -127,9 +138,9 @@ function App() {
     };
     return (
         <div className="App">
-            <button onClick={toggleMultiCheck}>
+            <Button onClick={toggleMultiCheck} variant="contained">
                 {allowMultiCheck ? "Disable" : "Enable"} multi-check
-            </button>
+            </Button>
             <CheckboxTreeComponent
                 data={data}
                 onChange={setData}

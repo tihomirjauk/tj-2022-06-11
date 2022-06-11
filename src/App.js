@@ -59,8 +59,6 @@ function CheckboxTreeComponent({ data, onChange, allowMultiCheck = false }) {
 
         // When you check on the parent checkbox,
         // the children checkboxes should also be checked
-        if (nextValue) {
-        }
         nextData[index].children.map((child) => {
             child.value = nextValue;
             return child;
@@ -136,6 +134,7 @@ function App() {
     const toggleMultiCheck = (event) => {
         setAllowMultiCheck(!allowMultiCheck);
     };
+
     return (
         <div className="App">
             <Button onClick={toggleMultiCheck} variant="contained">
